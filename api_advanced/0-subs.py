@@ -16,7 +16,8 @@ def number_of_subscribers(subreddit):
     # Set the custom User-Agent
     header = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    }
 
     # Construct the URL for the subreddit API
     url = f"https://api.reddit.com/r/{subreddit}/about"
