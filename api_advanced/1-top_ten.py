@@ -20,7 +20,6 @@ def top_ten(subreddit):
 
     # Construct the URL for the subreddit API
     url = f"https://api.reddit.com/r/{subreddit}/hot"
-
     # Send a GET request to the API with the custom User-Agent
     response = requests.get(url, headers=header, allow_redirects=False)
 
