@@ -1,49 +1,64 @@
 #!/usr/bin/python3
 """
-Contains the recurse function
+This module contains a function that queries the Reddit API and
+returns a list containing the titles of all hot articles for a given subreddit.
 """
-
 import requests
 
 
-def recurse(subreddit, hot_list=[], after=None):
+def recurse(subreddit, hot_list=None, after=None):
     """
-    Returns a list of all hot post titles for a given subreddit.
+    Queries the Reddit API and returns a list containing the titles
+    of all hot articles for a given subreddit.
 
     Args:
-        subreddit (str): The name of the subreddit.
-        hot_list (list, optional): The list to store the hot post titles. Defaults to an empty list.
-        after (str, optional): The "after" parameter to fetch the next page of hot posts. Defaults to None.
+        subreddit (str): The name of the subreddit to query.
+        hot_list (list): The list of hot article titles accumulated so far.
+        after (str): The 'after' parameter for pagination.
 
     Returns:
-        list: A list of hot post titles, or None if the subreddit is invalid or there are no hot posts.
+        list: A list of titles of hot articles, or
+        None if the subreddit is invalid.
     """
-    if subreddit is None or not isinstance(subreddit, str):
+    if hot_list is None:
+        hot_list = []
+
+    # Construct the URL for the Reddit API request
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
+    params = {'after': after, 'limit': 100}
+
+    # Make the API request
+    response = requests.get(
+        url,
+        headers=headers,
+        params=params,
+        allow_redirects=False)
+
+    # Check if the response status code is not 200 (OK)
+    if response.status_code != 200:
         return None
 
-    r = requests.get(
-        'http://www.reddit.com/r/{}/hot.json'.format(subreddit),
-        headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
-        allow_redirects=False,
-        params={
-            'after': after}).json()
+    # Parse the JSON response
+    data = response.json().get('data', {})
+    children = data.get('children', [])
 
-    after = r.get('data', {}).get('after', None)
-    posts = r.get('data', {}).get('children', None)
-
-    if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
-        if len(hot_list) == 0:
-            return None
+    # If there are no children, return the accumulated hot_list
+    if not children:
         return hot_list
-    else:
-        for post in posts:
-            hot_list.append(post.get('data', {}).get('title', None))
 
+    # Append the titles of the hot articles to the hot_list
+    for child in children:
+        hot_list.append(child['data']['title'])
+
+    # Get the 'after' parameter for the next page
+    after = data.get('after')
+
+    # If there is no 'after' parameter, return the accumulated hot_list
     if after is None:
-        if len(hot_list) == 0:
-            return None
         return hot_list
-    else:
-        return recurse(subreddit, hot_list, after)
+
+    # Recursively call the function with the updated 'after' parameter
+    return recurse(subreddit, hot_list, after)
