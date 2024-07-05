@@ -1,38 +1,50 @@
-#!/usr/bin/python3
-"""
-Contains the top_ten function
-"""
-
 import requests
 
 
 def top_ten(subreddit):
     """
-    Prints the titles of the top ten hot posts for a given subreddit.
+    Queries the Reddit API and prints the titles of the first 10 hot posts for a given subreddit.
 
     Args:
-        subreddit (str): The name of the subreddit.
+        subreddit (str): The name of the subreddit to retrieve the hot posts from.
 
     Returns:
         None
     """
-    if subreddit is None or not isinstance(subreddit, str):
+    # Construct the URL to the Reddit API endpoint for the hot posts of the given subreddit,
+    # with the "limit" parameter set to 10 to fetch the first 10 hot posts
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
+
+    # Set the User-Agent header to mimic a common web browser,
+    # to avoid being blocked by the Reddit API
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
+
+    try:
+        # Make a GET request to the constructed URL using the requests.get() method,
+        # and retrieve the JSON response
+        # Set the "allow_redirects" parameter to False to avoid following
+        # redirects
+        response = requests.get(url, headers=headers, allow_redirects=False)
+
+        # Raise an exception if the request was unsuccessful
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
+        # If the request fails, print "None" and return
         print(None)
         return
 
-    r = requests.get(
-        'http://www.reddit.com/r/{}/hot.json'.format(subreddit),
-        headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
-        params={
-            'limit': 10}).json()
+    # Extract the "children" (i.e., the hot posts) from the JSON response
+    data = response.json()
+    children = data['data']['children']
 
-    posts = r.get('data', {}).get('children', None)
-
-    if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
+    if not children:
+        # If the "children" list is empty (i.e., there are no hot posts for the given subreddit),
+        # print "None" and return
         print(None)
         return
 
-    for post in posts:
-        print(post.get('data', {}).get('title', None))
+    # Iterate over the hot posts and print the title of each post
+    for post in children:
+        print(post['data']['title'])
