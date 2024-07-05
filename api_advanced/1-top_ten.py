@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+"""
+This module contains a function that queries the Reddit API and
+returns the top 10 hot posts for a given subreddit.
+"""
 import requests
 
 
@@ -25,7 +29,7 @@ def top_ten(subreddit):
     try:
         # Make a GET request to the constructed URL using the requests.get() method,
         # and retrieve the JSON response. Set the "allow_redirects" parameter
-        # to False to avoid following redirects.
+        # too False to avoid following redirects.
         response = requests.get(url, headers=headers, allow_redirects=False)
 
         # Raise an exception if the request was unsuccessful
@@ -45,6 +49,7 @@ def top_ten(subreddit):
         print(None)
         return
 
-    # Iterate over the hot posts and print the title of each post
-    for post in children:
+    # Iterate over the hot posts and print the title of each post,
+    # but only if the length of the "children" list is 10 or less
+    for post in children[:10]:
         print(post['data']['title'])
