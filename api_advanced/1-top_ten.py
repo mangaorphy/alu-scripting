@@ -24,9 +24,8 @@ def top_ten(subreddit):
 
     try:
         # Make a GET request to the constructed URL using the requests.get() method,
-        # and retrieve the JSON response
-        # Set the "allow_redirects" parameter to False to avoid following
-        # redirects
+        # and retrieve the JSON response. Set the "allow_redirects" parameter
+        # to False to avoid following redirects.
         response = requests.get(url, headers=headers, allow_redirects=False)
 
         # Raise an exception if the request was unsuccessful
