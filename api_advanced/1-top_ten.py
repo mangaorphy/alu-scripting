@@ -24,7 +24,8 @@ def top_ten(subreddit):
     # to avoid being blocked by the Reddit API
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    }
 
     try:
         # Make a GET request to the constructed URL using the requests.get() method,
