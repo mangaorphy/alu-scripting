@@ -16,7 +16,8 @@ def top_ten(subreddit):
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
             "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
         params={
-            'limit': 10}).json()
+            'limit': 10},
+        allow_redirects=False).json()
     posts = r.get('data', {}).get('children', None)
     if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
         print(None)
