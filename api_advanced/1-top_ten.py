@@ -1,30 +1,21 @@
 #!/usr/bin/python3
-"""
-Contains the top_ten function
-"""
+"""Prints the title of the first 10 hot posts listed for a given subreddit"""
 
 import requests
 
 
 def top_ten(subreddit):
-    """prints the titles of the top ten hot posts for a given subreddit"""
-    if subreddit is None or not isinstance(subreddit, str):
+    """Main function"""
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/126.0.0.0 Safari/537.36"
+    }
+    try:
+        response = requests.get(url, headers=headers, allow_redirects=False)
+        hot_posts = response.json().get("data").get("children")
+        [print(post.get('data').get('title')) for post in hot_posts]
+    except Exception:
         print(None)
-    r = requests.get(
-        'http://www.reddit.com/r/{}/hot.json'.format(subreddit),
-        headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) "
-                          "Chrome/126.0.0.0 Safari/537.36"
-        },
-        params={
-            'limit': 10
-        },
-        allow_redirects=False
-    ).json()
-    posts = r.get('data', {}).get('children', None)
-    if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
-        print(None)
-    else:
-        for post in posts:
-            print(post.get('data', {}).get('title', None))
